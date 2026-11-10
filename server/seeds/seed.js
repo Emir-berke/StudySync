@@ -28,7 +28,7 @@ const seedDatabase = async () => {
 
     const databaseName = mongoose.connection.db.databaseName;
 
-    if (!databaseName.endsWith("_test")) {
+    if (databaseName !== "studysync_test") {
       throw new Error(
         "Test database name must end with _test"
       );
