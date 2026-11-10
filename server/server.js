@@ -3,6 +3,9 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+// MongoDB connection
+const connectDB = require("./config/db");
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -18,7 +21,13 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`StudySync server running on port ${PORT}`);
-});
+// Connect to MongoDB and start server
+const startServer = async () => {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`StudySync server running on port ${PORT}`);
+  });
+};
+
+startServer();
