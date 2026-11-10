@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables and passwords
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Allow safe example files
+!.env.example
+!**/.env.example

@@ -118,3 +118,50 @@ Then open a pull request on GitHub.
 - MongoDB Atlas connection configured
 - User, Session, and Task models created
 - Feature development in progress
+
+
+## API Testing
+
+StudySync uses Jest and Supertest for automated API testing.
+
+### Run Automated Tests
+
+1. Open a terminal.
+2. Navigate to the server folder:
+
+   cd server
+
+3. Run the tests:
+
+   npx jest --runInBand
+
+### Test Database
+
+Automated database tests use a separate MongoDB database
+named `studysync_test`.
+
+Configure the following variables in `server/.env`:
+
+- MONGO_URI: Main application database connection
+- TEST_MONGO_URI: Separate test database connection
+
+Never commit the `.env` file to GitHub.
+
+### Manual API Testing
+
+Talend API Tester is used to manually test API endpoints.
+
+Health Check:
+- Method: GET
+- URL: http://localhost:5000/api/health
+- Expected status: 200 OK
+
+Expected response:
+
+{
+  "message": "StudySync API is running!",
+  "status": "success"
+}
+
+Additional authentication, session, and task endpoints
+will be documented as they are implemented.
