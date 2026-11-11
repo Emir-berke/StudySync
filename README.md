@@ -230,6 +230,65 @@ Create requests require `title` and `scheduledAt` (an ISO 8601 date-time).
 }
 ```
 
+#### Response Format
+
+Successful list requests return `200` with a `sessions` array. Create returns
+`201`; detail, update, join, and leave return `200` with one `session` object.
+Delete returns `200` with a confirmation message.
+
+```json
+{
+  "success": true,
+  "sessions": [
+    {
+      "_id": "665000000000000000000001",
+      "title": "Biology review",
+      "description": "Review cell structure.",
+      "createdBy": {
+        "_id": "665000000000000000000002",
+        "name": "Jordan Lee",
+        "email": "jordan@example.com"
+      },
+      "participants": [
+        {
+          "_id": "665000000000000000000002",
+          "name": "Jordan Lee",
+          "email": "jordan@example.com"
+        }
+      ],
+      "scheduledAt": "2027-05-10T18:30:00.000Z",
+      "status": "upcoming",
+      "tasks": [
+        {
+          "_id": "665000000000000000000003",
+          "title": "Read chapter 4",
+          "description": "Review the assigned chapter.",
+          "session": "665000000000000000000001",
+          "assignedTo": {
+            "_id": "665000000000000000000002",
+            "name": "Jordan Lee",
+            "email": "jordan@example.com"
+          },
+          "status": "todo",
+          "priority": "medium",
+          "dueDate": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+Single-session responses use the same session shape under `session`, for example
+`{ "success": true, "session": { ... } }`. Delete responds with:
+
+```json
+{ "success": true, "message": "Session deleted" }
+```
+
+Errors use `{ "success": false, "message": "..." }`. Validation errors also
+include `errors`, an array of `{ "field", "message" }` objects.
+
 Each session's `tasks` array contains Task records with `title`, `description`,
 `session`, `assignedTo`, `status`, `priority`, and optional `dueDate`, following
 the shape in `server/seeds/sampleTasks.js`.
@@ -240,6 +299,8 @@ attempt to edit or delete return `403`.
 
 ### Session Client
 
-The React client in `client/` supports sign-in/registration and uses the session
-API for browsing, creating, editing, deleting, joining, and leaving sessions.
-Session details display related tasks.
+The current React client in `client/` is temporary integration scaffolding for
+exercising the session API. Its screens and styling are not a finished product
+UI and are expected to be replaced. The session API and data contract above are
+the implementation reference; the client can be redesigned or replaced without
+changing that contract.
