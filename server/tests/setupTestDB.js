@@ -1,5 +1,6 @@
 
 const mongoose = require("mongoose");
+const os = require("os");
 require("dotenv").config();
 
 const connectTestDB = async () => {
@@ -18,6 +19,7 @@ const connectTestDB = async () => {
   }
 
   await mongoose.connect(uri, {
+    runtimeAdapters: { os },
     serverSelectionTimeoutMS: 10000,
   });
 
