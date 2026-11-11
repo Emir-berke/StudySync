@@ -65,6 +65,9 @@ Set the following variables:
 
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
+TEST_MONGO_URI=your_studysync_test_connection_string
+JWT_SECRET=replace_with_a_long_random_secret
+JWT_EXPIRES_IN=1h
 
 Never commit .env to GitHub.
 
@@ -133,7 +136,7 @@ StudySync uses Jest and Supertest for automated API testing.
 
 3. Run the tests:
 
-   npx jest --runInBand
+   npm test
 
 ### Test Database
 
@@ -163,5 +166,34 @@ Expected response:
   "status": "success"
 }
 
-Additional authentication, session, and task endpoints
-will be documented as they are implemented.
+## Authentication and User API
+
+Authentication uses JSON Web Tokens. Send protected requests with the
+following header:
+
+`Authorization: Bearer <token>`
+
+### Public authentication endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| POST | `/api/auth/register` | Create a student account and return a JWT |
+| POST | `/api/auth/login` | Validate credentials and return a JWT |
+
+Registration requires `name`, `email`, and `password`. Passwords must be
+8–72 characters and contain an uppercase letter, lowercase letter, and number.
+
+### Protected user endpoints
+
+| Method | Endpoint | Access |
+| --- | --- | --- |
+| GET | `/api/users/me` | Authenticated user |
+| GET | `/api/users` | Administrator only |
+| GET | `/api/users/:id` | The account owner or an administrator |
+| PATCH | `/api/users/:id` | The account owner or an administrator |
+| DELETE | `/api/users/:id` | The account owner or an administrator |
+
+Students can update their own name or email. Only administrators can change
+the `role` field. Password hashes are never included in API responses.
+
+Additional session and task endpoints will be documented as they are implemented.
