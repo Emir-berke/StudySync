@@ -5,6 +5,7 @@ const cors = require("cors");
 const errorHandler = require("./middleware/errorHandler");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const sessionRoutes = require("./routes/sessionRoutes");
 
 const app = express();
 
@@ -22,8 +23,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-
-// Teammates will add their remaining API routes here.
+app.use("/api/sessions", sessionRoutes);
 
 // Error handler must be last
 app.use(errorHandler);
