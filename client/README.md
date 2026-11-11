@@ -1,16 +1,56 @@
-# React + Vite
+# StudySync Client (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Front end for StudySync. It talks to the Express API in `../server` through
+the Vite dev proxy (`/api` -> `http://localhost:5000`).
 
-Currently, two official plugins are available:
+## Run it
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+cd client
+npm install
+npm run dev        # http://localhost:5173
+```
 
-## React Compiler
+Start the backend in another terminal (`cd server && node server.js`) so
+register, login and account pages can reach the real API.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Folder structure
 
-## Expanding the ESLint configuration
+```
+src/
+  api/          fetch helper, auth/sessions/tasks API modules, mock data
+  auth/         AuthContext, AuthProvider (token + current user), useAuth hook
+  components/   NavBar, ProtectedRoute, SessionForm, TaskCard, ErrorMessage
+  pages/        Login, Register, Sessions, SessionBoard, Account, NotFound
+  utils/        validation, formatting, enum constants
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## How authentication works
+
+1. `POST /api/auth/login` or `/register` returns `{ token, user }`.
+2. `AuthProvider` stores the JWT in `localStorage` and the user in React state.
+3. `api/client.js` adds `Authorization: Bearer <token>` to every protected call.
+4. On refresh, `AuthProvider` calls `GET /api/users/me` to restore the user.
+5. A 401 on a protected call clears the token and sends the user to `/login`.
+6. `ProtectedRoute` guards `/sessions`, `/sessions/:id` and `/account`.
+
+## Mock mode
+
+Auth and user calls always use the real API. Sessions and tasks use demo data
+(stored in `localStorage`) until their endpoints are merged. To use the real
+sessions and tasks API, create `client/.env.local` containing:
+
+```
+VITE_USE_MOCK=false
+```
+
+The expected endpoints are documented at the top of `src/api/sessions.js` and
+`src/api/tasks.js`. If a path or method differs, change it in those two files.
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
