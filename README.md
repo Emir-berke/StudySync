@@ -1,4 +1,3 @@
-
 # StudySync
 
 StudySync is a collaborative study platform where students can create and join study sessions. Each session has its own task board to organize and track study activities.
@@ -13,17 +12,23 @@ StudySync is a collaborative study platform where students can create and join s
 ## Main Database Models
 
 ### User
+
 Stores student information, including name, email, and password hash.
 
 ### Session
-Stores study session details, including title, description, creator, participants, scheduled date, and status.
+
+Stores the title, description, creator, participants, scheduled date, and status
+for each study session. Related tasks use the Task model and are linked through
+the task's `session` field.
 
 ### Task
+
 Stores tasks belonging to a session, including title, description, assigned user, status, priority, and due date.
 
 ## Project Structure
 
 StudySync/
+
 - client/ - React frontend
 - server/ - Express backend
   - config/ - MongoDB connection
@@ -122,7 +127,6 @@ Then open a pull request on GitHub.
 - User, Session, and Task models created
 - Feature development in progress
 
-
 ## API Testing
 
 StudySync uses Jest and Supertest for automated API testing.
@@ -155,6 +159,7 @@ Never commit the `.env` file to GitHub.
 Talend API Tester is used to manually test API endpoints.
 
 Health Check:
+
 - Method: GET
 - URL: http://localhost:5000/api/health
 - Expected status: 200 OK
@@ -162,8 +167,8 @@ Health Check:
 Expected response:
 
 {
-  "message": "StudySync API is running!",
-  "status": "success"
+"message": "StudySync API is running!",
+"status": "success"
 }
 
 ## Authentication and User API
@@ -175,25 +180,127 @@ following header:
 
 ### Public authentication endpoints
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| POST | `/api/auth/register` | Create a student account and return a JWT |
-| POST | `/api/auth/login` | Validate credentials and return a JWT |
+| Method | Endpoint             | Purpose                                   |
+| ------ | -------------------- | ----------------------------------------- |
+| POST   | `/api/auth/register` | Create a student account and return a JWT |
+| POST   | `/api/auth/login`    | Validate credentials and return a JWT     |
 
 Registration requires `name`, `email`, and `password`. Passwords must be
 8–72 characters and contain an uppercase letter, lowercase letter, and number.
 
 ### Protected user endpoints
 
-| Method | Endpoint | Access |
-| --- | --- | --- |
-| GET | `/api/users/me` | Authenticated user |
-| GET | `/api/users` | Administrator only |
-| GET | `/api/users/:id` | The account owner or an administrator |
-| PATCH | `/api/users/:id` | The account owner or an administrator |
+| Method | Endpoint         | Access                                |
+| ------ | ---------------- | ------------------------------------- |
+| GET    | `/api/users/me`  | Authenticated user                    |
+| GET    | `/api/users`     | Administrator only                    |
+| GET    | `/api/users/:id` | The account owner or an administrator |
+| PATCH  | `/api/users/:id` | The account owner or an administrator |
 | DELETE | `/api/users/:id` | The account owner or an administrator |
 
 Students can update their own name or email. Only administrators can change
 the `role` field. Password hashes are never included in API responses.
 
-Additional session and task endpoints will be documented as they are implemented.
+### Study Session API
+
+All session endpoints require `Authorization: Bearer <token>`. Session responses
+include populated `createdBy` and `participants` summaries containing names and
+email addresses, never password data. Related `tasks` are populated using their
+`session` reference. The creator is automatically included in `participants`.
+
+| Method | Endpoint                  | Access        | Purpose                                 |
+| ------ | ------------------------- | ------------- | --------------------------------------- |
+| GET    | `/api/sessions`           | Authenticated | Browse sessions, soonest first          |
+| POST   | `/api/sessions`           | Authenticated | Create a session                        |
+| GET    | `/api/sessions/:id`       | Authenticated | View session details                    |
+| PATCH  | `/api/sessions/:id`       | Creator only  | Update title, description, date, status |
+| DELETE | `/api/sessions/:id`       | Creator only  | Delete a session and its tasks          |
+| POST   | `/api/sessions/:id/join`  | Authenticated | Join as a participant (safe to repeat)  |
+| POST   | `/api/sessions/:id/leave` | Authenticated | Leave a session                         |
+
+Create requests require `title` and `scheduledAt` (an ISO 8601 date-time).
+`description` and `status` are optional; status defaults to `upcoming`. For example:
+
+```json
+{
+  "title": "Biology review",
+  "description": "Review cell structure.",
+  "scheduledAt": "2027-05-10T18:30:00.000Z",
+  "status": "upcoming"
+}
+```
+
+#### Response Format
+
+Successful list requests return `200` with a `sessions` array. Create returns
+`201`; detail, update, join, and leave return `200` with one `session` object.
+Delete returns `200` with a confirmation message.
+
+```json
+{
+  "success": true,
+  "sessions": [
+    {
+      "_id": "665000000000000000000001",
+      "title": "Biology review",
+      "description": "Review cell structure.",
+      "createdBy": {
+        "_id": "665000000000000000000002",
+        "name": "Jordan Lee",
+        "email": "jordan@example.com"
+      },
+      "participants": [
+        {
+          "_id": "665000000000000000000002",
+          "name": "Jordan Lee",
+          "email": "jordan@example.com"
+        }
+      ],
+      "scheduledAt": "2027-05-10T18:30:00.000Z",
+      "status": "upcoming",
+      "tasks": [
+        {
+          "_id": "665000000000000000000003",
+          "title": "Read chapter 4",
+          "description": "Review the assigned chapter.",
+          "session": "665000000000000000000001",
+          "assignedTo": {
+            "_id": "665000000000000000000002",
+            "name": "Jordan Lee",
+            "email": "jordan@example.com"
+          },
+          "status": "todo",
+          "priority": "medium",
+          "dueDate": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+Single-session responses use the same session shape under `session`, for example
+`{ "success": true, "session": { ... } }`. Delete responds with:
+
+```json
+{ "success": true, "message": "Session deleted" }
+```
+
+Errors use `{ "success": false, "message": "..." }`. Validation errors also
+include `errors`, an array of `{ "field", "message" }` objects.
+
+Each session's `tasks` array contains Task records with `title`, `description`,
+`session`, `assignedTo`, `status`, `priority`, and optional `dueDate`, following
+the shape in `server/seeds/sampleTasks.js`.
+
+Validation failures and malformed session IDs return `400`; missing sessions
+return `404`; missing or invalid authentication returns `401`; non-owners who
+attempt to edit or delete return `403`.
+
+### Session Client
+
+The current React client in `client/` is temporary integration scaffolding for
+exercising the session API. Its screens and styling are not a finished product
+UI and are expected to be replaced. The session API and data contract above are
+the implementation reference; the client can be redesigned or replaced without
+changing that contract.
