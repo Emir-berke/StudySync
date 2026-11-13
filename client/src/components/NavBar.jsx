@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { USE_MOCK } from '../api/config'
+import { USE_MOCK, USE_MOCK_TASKS } from '../api/config'
 import { useAuth } from '../auth/useAuth'
 
 export default function NavBar() {
@@ -35,8 +35,8 @@ export default function NavBar() {
         )}
       </nav>
 
-      {USE_MOCK && user && (
-        <p className="mock-banner">Sessions and tasks are using demo data.</p>
+      {(USE_MOCK || USE_MOCK_TASKS) && user && (
+        <p className="mock-banner">Demo data is on for {[USE_MOCK && 'sessions', USE_MOCK_TASKS && 'tasks'].filter(Boolean).join(' and ')}.</p>
       )}
     </header>
   )

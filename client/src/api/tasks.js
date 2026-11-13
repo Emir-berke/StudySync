@@ -1,5 +1,5 @@
 import { request } from './client'
-import { USE_MOCK } from './config'
+import { USE_MOCK_TASKS } from './config'
 import { mockTasks } from './mock'
 
 // PROPOSED CONTRACT - confirm with the Tasks lead before switching off mock mode.
@@ -18,4 +18,4 @@ const realTasks = {
   remove: (id) => request(`/tasks/${id}`, { method: 'DELETE' }),
 }
 
-export const tasksApi = USE_MOCK ? mockTasks : realTasks
+export const tasksApi = USE_MOCK_TASKS ? mockTasks : realTasks

@@ -41,7 +41,8 @@ Auth and user calls always use the real API. Sessions and tasks use demo data
 sessions and tasks API, create `client/.env.local` containing:
 
 ```
-VITE_USE_MOCK=false
+VITE_USE_MOCK=false          # real Session API (merged)
+VITE_USE_MOCK_TASKS=false    # real Task API (add once it is merged)
 ```
 
 The expected endpoints are documented at the top of `src/api/sessions.js` and

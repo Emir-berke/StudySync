@@ -23,8 +23,8 @@ Run it with the backend (`cd server && node server.js`) and the client
 | 10 | Account update | Change your name and save | Success message; navbar shows the new name | PATCH `/api/users/:id` | | |
 | 11 | Session list | Open Sessions | Sessions load; a loading message shows first | GET `/api/sessions` | | |
 | 12 | Create session | New session with title, date and time | New card appears at the top | POST `/api/sessions` | | |
-| 13 | Edit session | Edit your own session title and status | Card updates | PUT `/api/sessions/:id` | | |
-| 14 | Join and leave | Join another user's session, then leave | Button and joined count change each time | POST `/api/sessions/:id/join`, DELETE `/api/sessions/:id/leave` | | |
+| 13 | Edit session | Edit your own session title and status | Card updates | PATCH `/api/sessions/:id` | | |
+| 14 | Join and leave | Join another user's session, then leave | Button and joined count change each time | POST `/api/sessions/:id/join`, POST `/api/sessions/:id/leave` | | |
 | 15 | Owner-only actions | View a session you did not create | No Edit or Delete buttons | none | | |
 | 16 | Task board | Open a session's task board | Tasks appear in To Do, In Progress and Done | GET `/api/sessions/:id/tasks` | | |
 | 17 | Create task | Add a task with title and priority | Appears in To Do | POST `/api/sessions/:id/tasks` | | |
