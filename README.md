@@ -297,6 +297,111 @@ Validation failures and malformed session IDs return `400`; missing sessions
 return `404`; missing or invalid authentication returns `401`; non-owners who
 attempt to edit or delete return `403`.
 
+### Tasks API
+
+All task endpoints require authentication using a JSON Web Token (JWT).
+
+Send the token in the request header:
+
+`Authorization: Bearer <token>`
+
+Tasks belong to a study session and are connected through the `session` field.
+
+#### Task Endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/tasks` | Create a new task |
+| GET | `/api/tasks` | Retrieve tasks from sessions the user belongs to |
+| GET | `/api/tasks?status=todo` | Filter tasks by status |
+| GET | `/api/tasks/:id` | Retrieve a specific task |
+| PUT | `/api/tasks/:id` | Update task details |
+| PUT | `/api/tasks/:id/status` | Update task status |
+| PUT | `/api/tasks/:id/assign` | Assign or unassign a task |
+| DELETE | `/api/tasks/:id` | Delete a task |
+
+#### Task Fields
+
+| Field | Description |
+|---|---|
+| title | Task title |
+| description | Task description |
+| session | Study session associated with the task |
+| assignedTo | User assigned to the task (can be null) |
+| status | Task progress |
+| priority | Task priority |
+| dueDate | Task due date (can be null) |
+
+#### Task Status
+
+Available status values:
+
+- `todo` – Task has not been started.
+- `in-progress` – Task is currently being worked on.
+- `done` – Task has been completed.
+
+#### Task Priority
+
+Available priority values:
+
+- `low`
+- `medium`
+- `high`
+
+#### Access Control
+
+- All task endpoints require authentication.
+- Users can view tasks belonging to sessions they participate in.
+- Only session owners can create, update, assign, change the status of, or delete tasks.
+- Tasks can only be assigned to members of the associated study session.
+- Tasks can be unassigned by setting `assignedTo` to null.
+
+#### Response Format
+
+Successful responses return a success indicator and the relevant task information.
+
+Task lists return:
+
+```json
+{
+  "success": true,
+  "tasks": []
+}
+```
+
+Individual task operations return:
+
+```json
+{
+  "success": true,
+  "task": {}
+}
+```
+
+Successful task creation returns `201`. Other successful operations return `200`.
+
+Errors return a success indicator of false and an error message. Depending on the issue, responses may include:
+
+- `400` – Invalid input, task ID, or status.
+- `401` – Authentication required or invalid.
+- `403` – User does not have permission.
+- `404` – Task or session not found.
+
+#### Automated Testing
+
+The Tasks API was tested using Jest and Supertest.
+
+Tests cover:
+
+- Creating, retrieving, updating, and deleting tasks.
+- Filtering tasks by status.
+- Updating task status.
+- Assigning and unassigning tasks.
+- Authentication and authorization.
+- Session membership restrictions.
+- Invalid task IDs and validation errors.
+
+
 ### Session Client
 
 The current React client in `client/` is temporary integration scaffolding for
