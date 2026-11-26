@@ -55,7 +55,7 @@ export default function AccountPage() {
 
   return (
     <section className="card narrow">
-      <h1>Your account</h1>
+      <h1>My Profile</h1>
       <p className="hint">Role: {user.role}</p>
 
       <form onSubmit={handleSave} noValidate>

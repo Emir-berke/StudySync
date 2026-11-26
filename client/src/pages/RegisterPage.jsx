@@ -92,11 +92,11 @@ export default function RegisterPage() {
         />
 
         <button type="submit" className="btn" disabled={submitting}>
-          {submitting ? 'Creating account…' : 'Register'}
+          {submitting ? 'Creating account…' : 'Sign Up'}
         </button>
       </form>
       <p>
-        Already registered? <Link to="/login">Log in</Link>
+        Already registered? <Link to="/login">Sign in</Link>
       </p>
     </section>
   )

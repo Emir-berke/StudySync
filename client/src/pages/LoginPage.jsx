@@ -42,7 +42,7 @@ export default function LoginPage() {
 
   return (
     <section className="card narrow">
-      <h1>Log in</h1>
+      <h1>Sign In</h1>
       <form onSubmit={handleSubmit} noValidate>
         <ErrorMessage error={error} />
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
         />
 
         <button type="submit" className="btn" disabled={submitting}>
-          {submitting ? 'Logging in…' : 'Log in'}
+          {submitting ? 'Signing in…' : 'Sign In'}
         </button>
       </form>
       <p>
