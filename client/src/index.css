@@ -4,13 +4,15 @@
   --text: #1f2430;
   --muted: #5d6475;
   --border: #dde1ea;
-  --primary: #3a56d4;
-  --primary-hover: #2c43b0;
+  --primary: #14244b;
+  --primary-hover: #0d1a38;
+  --accent: #0f8f80;
+  --link: #0b6f64;
   --danger: #c0392b;
   --success-bg: #e7f6ec;
   --error-bg: #fdecea;
   --radius: 10px;
-  font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
+  font: 16px/1.5 system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
 }
@@ -44,7 +46,7 @@ h3 {
 }
 
 a {
-  color: var(--primary);
+  color: var(--link);
 }
 
 /* Layout */
@@ -54,7 +56,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.6rem 1.25rem;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
@@ -62,28 +64,55 @@ a {
 .navbar nav {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
-.navbar nav a {
+.navbar nav a:not(.btn) {
   text-decoration: none;
   color: var(--muted);
   font-weight: 500;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
 }
 
-.navbar nav a.active {
+.navbar nav a:not(.btn):hover {
   color: var(--primary);
 }
 
+.navbar nav a[aria-current='page'] {
+  color: var(--primary);
+  border-bottom-color: var(--accent);
+}
+
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 700;
   font-size: 1.2rem;
   text-decoration: none;
+  color: var(--primary);
+}
+
+.brand img {
+  border-radius: 50%;
 }
 
 .nav-user {
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.menu-toggle {
+  display: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .mock-banner {
@@ -151,9 +180,11 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus,
-.btn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
+.btn:focus-visible,
+.menu-toggle:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .checkbox {
@@ -206,7 +237,7 @@ hr {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #eef1fd;
+  background: #e8f5f3;
 }
 
 .btn-danger {
@@ -354,5 +385,133 @@ hr {
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* Landing page */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.hero h1 {
+  font-size: 2.4rem;
+  color: var(--primary);
+}
+
+.hero-tagline {
+  max-width: 34rem;
+  margin: 0 0 1.25rem;
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.hero-logo img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.sessions-section {
+  /* Reserve room so the footer does not jump when the list arrives. */
+  min-height: 22rem;
+}
+
+.session-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.session-card {
+  margin: 0;
+}
+
+.session-card p {
+  margin: 0.25rem 0;
+}
+
+/* Tables and footer */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 2rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+/* Narrow screens: collapse the links behind a menu button */
+@media (max-width: 640px) {
+  .menu-toggle {
+    display: inline-block;
+  }
+
+  .navbar nav {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding-top: 0.5rem;
+  }
+
+  .navbar nav.open {
+    display: flex;
+  }
+
+  .hero {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    padding: 1.25rem;
+  }
+
+  .hero h1 {
+    font-size: 1.9rem;
+  }
+
+  .hero-logo img {
+    width: 120px;
+    height: auto;
+  }
+
+  .container {
+    padding: 1rem 1rem 2rem;
   }
 }

@@ -185,6 +185,14 @@ export const mockTasks = {
     return task
   },
 
+  async setStatus(id, status) {
+    return this.update(id, { status })
+  },
+
+  async assign(id, assignedTo) {
+    return this.update(id, { assignedTo })
+  },
+
   async remove(id) {
     await delay()
     const db = read()
