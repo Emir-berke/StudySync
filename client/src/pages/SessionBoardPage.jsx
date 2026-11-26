@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { sessionsApi } from '../api/sessions'
 import { tasksApi } from '../api/tasks'
+import { USE_MOCK_TASKS } from '../api/config'
 import { useAuth } from '../auth/useAuth'
 import ErrorMessage from '../components/ErrorMessage'
 import TaskCard from '../components/TaskCard'
@@ -59,8 +60,8 @@ export default function SessionBoardPage() {
         title: form.title.trim(),
         description: form.description.trim(),
         priority: form.priority,
-        dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : null,
-        assignedTo: form.mine ? user.id : null,
+        ...(form.dueDate ? { dueDate: new Date(form.dueDate).toISOString() } : {}),
+        ...(form.mine ? { assignedTo: user.id } : {}),
       })
       setTasks((current) => [...current, created])
       setForm(EMPTY_TASK)
@@ -75,7 +76,7 @@ export default function SessionBoardPage() {
     setError(null)
     setBusy(true)
     try {
-      const updated = await tasksApi.update(refId(task), { status })
+      const updated = await tasksApi.setStatus(refId(task), status)
       setTasks((current) =>
         current.map((item) => (refId(item) === refId(updated) ? updated : item)),
       )
@@ -111,6 +112,9 @@ export default function SessionBoardPage() {
     )
   }
 
+  // The Task API lets only the session owner change tasks. Demo data is open to everyone.
+  const canEdit = USE_MOCK_TASKS || refId(session.createdBy) === user.id
+
   return (
     <section>
       <Link to="/sessions">← Back to sessions</Link>
@@ -125,6 +129,11 @@ export default function SessionBoardPage() {
 
       <ErrorMessage error={error} />
 
+      {!canEdit && (
+        <p className="hint">Only the session owner can add or change tasks.</p>
+      )}
+
+      {canEdit && (
       <form className="card inline-form" onSubmit={handleCreate} noValidate>
         <h2>Add a task</h2>
         <div className="field">
@@ -178,6 +187,7 @@ export default function SessionBoardPage() {
           Add task
         </button>
       </form>
+      )}
 
       <div className="board">
         {TASK_COLUMNS.map((column) => {
@@ -193,6 +203,7 @@ export default function SessionBoardPage() {
                   key={refId(task)}
                   task={task}
                   busy={busy}
+                  canEdit={canEdit}
                   onMove={handleMove}
                   onDelete={handleDelete}
                 />

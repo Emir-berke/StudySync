@@ -1,7 +1,7 @@
 import { TASK_COLUMNS } from '../utils/constants'
 import { formatDate } from '../utils/format'
 
-export default function TaskCard({ task, onMove, onDelete, busy }) {
+export default function TaskCard({ task, onMove, onDelete, busy, canEdit = true }) {
   const index = TASK_COLUMNS.findIndex((column) => column.status === task.status)
   const previous = TASK_COLUMNS[index - 1]
   const next = TASK_COLUMNS[index + 1]
@@ -15,6 +15,7 @@ export default function TaskCard({ task, onMove, onDelete, busy }) {
         {task.dueDate && <span> Due {formatDate(task.dueDate)}</span>}
       </p>
 
+      {canEdit && (
       <div className="row">
         {previous && (
           <button
@@ -45,6 +46,7 @@ export default function TaskCard({ task, onMove, onDelete, busy }) {
           Delete
         </button>
       </div>
+      )}
     </article>
   )
 }
