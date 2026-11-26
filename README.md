@@ -402,10 +402,28 @@ Tests cover:
 - Invalid task IDs and validation errors.
 
 
-### Session Client
+### Front End (client/)
 
-The current React client in `client/` is temporary integration scaffolding for
-exercising the session API. Its screens and styling are not a finished product
-UI and are expected to be replaced. The session API and data contract above are
-the implementation reference; the client can be redesigned or replaced without
-changing that contract.
+The React client in `client/` is the product UI. Its main parts:
+
+- **Landing page** (`/`): StudySync name, team logo, Sign Up and Sign In links and a list of upcoming study sessions.
+- **Authentication**: sign up, sign in, saved-session restore, expired-token handling and protected routes.
+- **Navigation**: shows the current page; Sessions, My Profile and Sign Out for signed-in users; Users for admins only; collapses behind a Menu button on narrow screens.
+- **Sessions and task board**: list, create, edit, delete, join and leave sessions; a To Do, In Progress and Done board per session. Only the session owner can change tasks, matching the Task API.
+- **Responsive layout** checked at desktop and 390 px widths.
+
+The client calls the real Express API by default. Demo data for sessions and
+tasks can be switched on in `client/.env.local`; see `client/README.md`.
+
+Run the unit tests with `cd client && npm test`.
+
+Supporting material is in `docs/`:
+
+- `docs/frontend-e2e-checklist.md`: manual end-to-end checklist (30 steps).
+- `docs/performance.md`: Lighthouse before and after results.
+- `docs/screenshots/`: desktop and 390 px screenshots of every main screen.
+- `docs/evidence/`: unit-test, browser-check and performance result images.
+
+The landing page needs a public session list. The proposed endpoint is
+`GET /api/public/sessions` (no token, no emails or participant lists); until it
+is merged the page shows labelled sample sessions.
