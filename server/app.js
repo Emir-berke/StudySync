@@ -1,6 +1,7 @@
 
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const errorHandler = require("./middleware/errorHandler");
 const authRoutes = require("./routes/authRoutes");
@@ -10,8 +11,18 @@ const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Security middleware
+app.use(helmet());
+
+// CORS configuration
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://studysync-frontend-kv0s.onrender.com"
+  ]
+}));
+
+// JSON middleware
 app.use(express.json());
 
 // Health-check route
@@ -22,6 +33,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/sessions", sessionRoutes);
