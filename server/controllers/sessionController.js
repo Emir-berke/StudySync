@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 
 const Session = require('../models/Session');
@@ -7,8 +8,13 @@ const populated = (query) =>
   query
     .populate('createdBy', 'name email')
     .populate('participants', 'name email')
-    .populate('tasks')
-    .populate('tasks.assignedTo', 'name email');
+    .populate({
+      path: 'tasks',
+      populate: {
+        path: 'assignedTo',
+        select: 'name email',
+      },
+    });
 
 const invalidId = (id) => !mongoose.isValidObjectId(id);
 
@@ -44,8 +50,14 @@ const createSession = async (req, res) => {
 
   await session.populate('createdBy', 'name email');
   await session.populate('participants', 'name email');
-  await session.populate('tasks');
-  await session.populate('tasks.assignedTo', 'name email');
+
+  await session.populate({
+    path: 'tasks',
+    populate: {
+      path: 'assignedTo',
+      select: 'name email',
+    },
+  });
 
   res.status(201).json({ success: true, session });
 };
