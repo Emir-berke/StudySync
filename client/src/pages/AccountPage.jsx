@@ -11,6 +11,7 @@ export default function AccountPage() {
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState('')
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   function handleChange(event) {
     setNotice('')
@@ -46,10 +47,13 @@ export default function AccountPage() {
     if (!confirmed) return
 
     setError(null)
+    setDeleting(true)
     try {
       await deleteAccount(user.id)
     } catch (err) {
       setError(err)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -78,15 +82,15 @@ export default function AccountPage() {
           onChange={handleChange}
         />
 
-        <button type="submit" className="btn" disabled={saving}>
+        <button type="submit" className="btn" disabled={saving || deleting}>
           {saving ? 'Saving…' : 'Save changes'}
         </button>
       </form>
 
       <hr />
       <h2>Danger zone</h2>
-      <button type="button" className="btn btn-danger" onClick={handleDelete}>
-        Delete my account
+      <button type="button" className="btn btn-danger" disabled={saving || deleting} onClick={handleDelete}>
+        {deleting ? 'Deleting…' : 'Delete my account'}
       </button>
     </section>
   )

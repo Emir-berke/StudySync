@@ -126,4 +126,46 @@ describe("Authentication API with the test database", () => {
     expect(adminListResponse.statusCode).toBe(200);
     expect(adminListResponse.body.users).toHaveLength(2);
   });
+
+  test("students cannot edit or delete another account or promote themselves", async () => {
+    const first = await request(app).post("/api/auth/register").send(registration);
+    const other = await request(app).post("/api/auth/register").send({
+      ...registration, email: "other@example.com",
+    });
+    for (const method of ["patch", "delete"]) {
+      const response = await request(app)[method](`/api/users/${other.body.user.id}`)
+        .set("Authorization", `Bearer ${first.body.token}`)
+        .send(method === "patch" ? { name: "Unauthorized" } : {});
+      expect(response.statusCode).toBe(403);
+    }
+    const promotion = await request(app).patch(`/api/users/${first.body.user.id}`)
+      .set("Authorization", `Bearer ${first.body.token}`).send({ role: "admin" });
+    expect(promotion.statusCode).toBe(403);
+    expect((await User.findById(first.body.user.id)).role).toBe("student");
+    expect(await User.findById(other.body.user.id)).not.toBeNull();
+  });
+
+  test("admin edits persist, duplicate email is rejected, and deletion invalidates the user token", async () => {
+    const target = await request(app).post("/api/auth/register").send(registration);
+    await User.create({ name: "Admin", email: "admin@example.com", role: "admin",
+      passwordHash: await bcrypt.hash("AdminPassword123", 10) });
+    const admin = await request(app).post("/api/auth/login")
+      .send({ email: "admin@example.com", password: "AdminPassword123" });
+    const endpoint = `/api/users/${target.body.user.id}`;
+    const updated = await request(app).patch(endpoint)
+      .set("Authorization", `Bearer ${admin.body.token}`)
+      .send({ name: "Admin updated", email: "UPDATED@example.com" });
+    expect(updated.statusCode).toBe(200);
+    expect(updated.body.user.passwordHash).toBeUndefined();
+    expect((await User.findById(target.body.user.id)).email).toBe("updated@example.com");
+    const duplicate = await request(app).patch(endpoint)
+      .set("Authorization", `Bearer ${admin.body.token}`).send({ email: "admin@example.com" });
+    expect(duplicate.statusCode).toBe(409);
+    const deleted = await request(app).delete(endpoint)
+      .set("Authorization", `Bearer ${admin.body.token}`);
+    expect(deleted.statusCode).toBe(200);
+    const restore = await request(app).get("/api/users/me")
+      .set("Authorization", `Bearer ${target.body.token}`);
+    expect(restore.statusCode).toBe(401);
+  });
 });

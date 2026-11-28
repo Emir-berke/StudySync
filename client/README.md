@@ -93,13 +93,43 @@ shows labelled sample sessions. Set `VITE_USE_MOCK_PUBLIC=false` in
 
 ```bash
 cd client
-npm test            # Vitest + React Testing Library, 26 tests
+npm test            # Vitest + React Testing Library
 ```
 
 Covered so far: `NavBar` (signed-out and signed-in links, admin-only Users link,
 current-page marker, sign out, menu button), `LandingPage` (content, sessions,
 loading, empty and error states, no private data), `AdminRoute` and `UsersPage`.
 Evidence from the latest run is in `docs/evidence/`.
+
+SCRUM-11 adds auth/profile page and auth-provider tests, API error/token tests,
+and admin User editing/deletion tests. The admin-only `/users` page reuses the
+SCRUM-10 table. Users create accounts through Sign Up; students manage their
+own profile; admins can edit names/emails/roles and delete accounts. Self-edits
+also update the auth context so role changes take effect immediately.
+
+### Cypress auth/User tests
+
+These tests create and delete disposable accounts. Use a separate local MongoDB
+instance/database, never Atlas or the team database. Install dependencies in
+both `client/` and `server/`, then run MongoDB locally on port 27018.
+
+1. Start Express with `MONGO_URI=mongodb://127.0.0.1:27018/studysync_e2e`,
+   `PORT=5050` and a locally generated `JWT_SECRET`.
+2. Start Vite with `VITE_API_URL=http://localhost:5050/api npm run dev`.
+3. In another client terminal:
+
+```bash
+E2E_MONGO_URI=mongodb://127.0.0.1:27018/studysync_e2e npm run test:e2e
+```
+
+The fixture refuses non-local databases or a database name other than
+`studysync_e2e`. It creates a test-only admin, without a production backdoor.
+The tests cover registration, duplicate email, incorrect login, restoration,
+profile persistence, student/admin access, expired tokens, account deletion
+and admin User CRUD. Videos and screenshots are generated under `cypress/`
+and ignored by Git. Curated evidence is in `../docs/evidence/scrum-11/`.
+The tests and recording were AI-assisted; the instructor's specific meaning
+of "AI Cypress" still requires team clarification.
 
 ## Performance
 

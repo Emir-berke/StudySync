@@ -55,6 +55,8 @@ Thumbs.db
 
 # Test output
 .nyc_output/
+client/cypress/videos/
+client/cypress/screenshots/
 
 # Local backups
 *.bak
