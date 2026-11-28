@@ -5,7 +5,15 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'cypress/videos', 'cypress/screenshots']),
+  {
+    files: ['cypress.config.js'],
+    languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['cypress/**/*.js'],
+    languageOptions: { globals: { cy: 'readonly', Cypress: 'readonly', describe: 'readonly', it: 'readonly', expect: 'readonly', beforeEach: 'readonly' } },
+  },
   {
     files: ['**/*.{js,jsx}'],
     extends: [

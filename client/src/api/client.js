@@ -1,28 +1,37 @@
 import { API_BASE_URL } from './config'
 
 const TOKEN_KEY = 'studysync_token'
+let memoryToken = null
+let memoryOnly = false
 
 // The JWT lives in localStorage so a page refresh keeps the user signed in.
 export const tokenStore = {
   get() {
+    if (memoryOnly) return memoryToken
     try {
       return localStorage.getItem(TOKEN_KEY)
     } catch {
-      return null
+      return memoryToken
     }
   },
   set(token) {
+    memoryToken = token
     try {
       localStorage.setItem(TOKEN_KEY, token)
+      memoryOnly = false
     } catch {
+      memoryOnly = true
       // Storage unavailable: the user stays signed in for this page view only.
     }
   },
   clear() {
+    memoryToken = null
     try {
       localStorage.removeItem(TOKEN_KEY)
+      memoryOnly = false
     } catch {
-      // Nothing to clear.
+      // Ignore a stale stored token for the remainder of this page view.
+      memoryOnly = true
     }
   },
 }
